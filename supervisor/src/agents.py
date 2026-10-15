@@ -2,7 +2,6 @@ from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
 from langchain.chat_models import init_chat_model
 from dotenv import load_dotenv
-from pydantic import BaseModel
 import os
 
 load_dotenv()
@@ -66,7 +65,3 @@ async def executar_supervisor(texto_usuario: str) -> str:
 
 
 
-class ChatRequest(BaseModel):
-    message: str
-    session_id: str
-    client_id: str
