@@ -1,17 +1,35 @@
-from langchain.agents import create_agent
-from langchain_core.messages import HumanMessage
-from langchain.chat_models import init_chat_model
-from dotenv import load_dotenv
+import logging
 import os
+from typing import List
+from dotenv import load_dotenv
+from pydantic import BaseModel, Field
 
+from langchain.chat_models import init_chat_model
+from langchain.output_parsers import JsonOutputParser
+
+logger = logging.getLogger(__name__)
 load_dotenv()
-
 
 _llm = init_chat_model(
     model="gpt-4o",
     api_key=os.getenv("OPENAI_API_KEY"),
     temperature=0.7
 )
+
+
+class RouterOutPut(BaseModel):
+    agents: List[str] = Field(
+        description = "Lista de agentes que devem responder a pergunta"
+    )
+
+
+parser = JsonOutputParser(pydantic_object = RouterOutPut)
+
+
+
+
+
+
 
 agente_cartao_credito = create_agent(
     _llm,
