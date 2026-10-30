@@ -25,61 +25,25 @@ class RouterOutPut(BaseModel):
 
 parser = JsonOutputParser(pydantic_object = RouterOutPut)
 
+def classifique_intencao_do_usuario(query: str) -> List[dict]:
+    """
+    Classifica a pergunta e retorna quais agentes devem ser chamados.
+    """
 
+    prompt = f""""
+    Você é um roteador de agentes de um banco.
 
+    Agentes disponíveis:
 
-
-
-
-agente_cartao_credito = create_agent(
-    _llm,
-    tools=[],
-    system_prompt=(
-        "Você é um especialista em cartão de crédito do banco MDBank. "
-        "Ajude o cliente com dúvidas, solicitação e limites."
-    )
-)
-
-agente_abertura_conta = create_agent(
-    _llm,
-    tools=[],
-    system_prompt=(
-        "Você é um especialista em abertura de contas do banco MDBank. "
-        "Ajude o cliente a abrir uma conta e explique os tipos disponíveis."
-    )
-)
-
-def classificar_pergunta(pergunta: str) -> str:
-    prompt = f"""
-    Classifique a intenção do usuário.
-
-    Possíveis agentes:
     cartao_credito
     abrir_conta
 
-    Pergunta: {pergunta}
+    Uma pergunta pode exigir mais de um agente.
 
-    Responda apenas com o nome do agente.
+    Responda apenas em JSON.
+
+    Pergunta:
+    {query}
+
+    {parser.get_format_instructions()}
     """
-    resposta = _llm.invoke(prompt)
-    return str(resposta.content).strip()
-
-async def executar_supervisor(texto_usuario: str) -> str:
-    agente = classificar_pergunta(texto_usuario)
-
-    if agente == "cartao_credito":
-        resultado = agente_cartao_credito.invoke(
-            {"messages": [HumanMessage(content=texto_usuario)]}
-        )
-    elif agente == "abrir_conta":
-        resultado = agente_abertura_conta.invoke(
-            {"messages": [HumanMessage(content=texto_usuario)]}
-        )
-    else:
-        resultado = "Não consegui entender sua solicitação"
-
-    mensagem_ia = resultado["messages"][-1]
-    return str(mensagem_ia.content)
-
-
-
