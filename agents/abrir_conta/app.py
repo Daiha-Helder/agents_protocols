@@ -17,21 +17,20 @@ _llm = init_chat_model(
 
 app = FastAPI()
 
-agente_cartao_credito = create_agent(
+agente_abertura_conta = create_agent(
     _llm,
     tools=[],
     system_prompt=(
-        "Você é um especialista em cartão de crédito do banco MDBank."
-        "Os cartões que existem no MDBank são: [platinum, gold, silver, e mdzao]."
-        "Ajude o cliente com dúvidas, solicitação e limites."
+        "Você é um especialista em abertura de contas do banco MDBank. "
+        "Ajude o cliente a abrir uma conta e explique os tipos disponíveis."
     )
 )
 
-class CartaoCreditoRequest(BaseModel):
+class AbrirContaRequest(BaseModel):
     message: str
 
-@app.post("/chat")
-async def consultar(request: CartaoCreditoRequest):
+@app.post("/send")
+async def consultar(request: AbrirContaRequest):
     
     mensagem = request.message
     
@@ -42,7 +41,7 @@ async def consultar(request: CartaoCreditoRequest):
         )
 
     try:
-        resultado = agente_cartao_credito.invoke(
+        resultado = agente_abertura_conta.invoke(
             {'messages': [HumanMessage(content=mensagem)]}
         )
         mensagem_ia = resultado["messages"][-1]

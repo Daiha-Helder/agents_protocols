@@ -13,7 +13,7 @@ load_dotenv()
 _llm = init_chat_model(
     model="gpt-4o",
     api_key=os.getenv("OPENAI_API_KEY"),
-    temperature=0.7
+    temperature=0
 )
 
 
@@ -47,3 +47,20 @@ def classifique_intencao_do_usuario(query: str) -> List[dict]:
 
     {parser.get_format_instructions()}
     """
+
+    resposta = _llm.invoke(prompt)
+    resultado = parser.parse(str(resposta))
+    agentes = resultado["agents"]
+
+    logger.info(f"Agentes selecionados: {agentes}")
+
+    return [
+        {
+            "query": query,
+            "agent": agente
+        }
+        for agente in agentes
+    ]
+
+
+
