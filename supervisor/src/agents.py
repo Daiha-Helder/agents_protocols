@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
 from langchain.chat_models import init_chat_model
-from langchain.output_parsers import JsonOutputParser
+from langchain_core.output_parsers import JsonOutputParser
 
 logger = logging.getLogger(__name__)
 load_dotenv()
@@ -49,7 +49,7 @@ def classifique_intencao_do_usuario(query: str) -> List[dict]:
     """
 
     resposta = _llm.invoke(prompt)
-    resultado = parser.parse(str(resposta))
+    resultado = parser.parse(resposta.content)
     agentes = resultado["agents"]
 
     logger.info(f"Agentes selecionados: {agentes}")

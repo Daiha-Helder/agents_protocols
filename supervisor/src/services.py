@@ -61,4 +61,36 @@ def cartao_credito_node(state: State):
 
     return {"responses": [resposta]}
 
-# Minuto 10:55
+def abrir_conta_node(state: State):
+    query = state.get("query", "")
+    logger.info("Executando agente ABRIR_CONTA")
+
+    resposta = request_agent(
+        query,
+        "abrir_conta_agent"
+    )
+
+    return {"responses": [resposta]}
+
+builder = StateGraph(State)
+builder.add_node("cartao_credito", cartao_credito_node)
+builder.add_node("abrir_conta", abrir_conta_node)
+builder.add_conditional_edges(
+    START,
+    no_de_roteamento
+)
+builder.add_edge("cartao_credito", END)
+builder.add_edge("abrir_conta", END)
+graph = builder.compile()
+
+async def executar_supervisor(texto_usuario: str):
+    
+    input_state: State = {
+        "query": texto_usuario,
+        "responses": []
+    }
+
+    result = graph.invoke(input_state)
+
+    return "\n\n".join(result["responses"])
+

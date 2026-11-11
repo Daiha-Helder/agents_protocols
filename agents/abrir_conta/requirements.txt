@@ -1,3 +1,4 @@
+fastapi
 a2a-sdk[http-server]
 httpx
 pydantic
